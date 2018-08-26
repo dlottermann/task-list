@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<!--  Static resources from Webjars -->
+	<meta name="description" content="" />
+	<meta name="viewport" content="width=device-width" />
+
+	<link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css" />
+	<script type="text/javascript" src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+
+	<title>Home</title>
+</head>
+
+<body>
+	<div class="container">
+		<div class="header clearfix">
+
+			<h3 class="text-muted">TASK-LIST</h3>
+		</div>
+
+
+		<div class="container">
+			<h2>Categorias</h2>
+			<div align="right">
+				<button type="button" id="modal_button" class="btn btn-info">Adicionar</button>
+
+			</div>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Cód.</th>
+						<th>Descrição</th>
+						<th colspan="2"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="cat : ${categories}">
+						<td>
+							<span th:text="${cat.id}"></span>
+						</td>
+						<td>
+							<span th:text="${cat.description}"></span>
+						</td>
+						<td>
+							<a href="javascript:;" th:id="${cat.id}" class="btn btn-warning update">Editar</a>
+						</td>
+						<td>
+							<a href="javascript:;" th:id="${cat.id}" class="btn btn-danger delete">Excluir</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+
+	</div>
+
+
+	<div id="customerModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form method="POST" action="save" name="frmCadastro">
+					<div class="modal-header">
+						<h4 class="modal-title">Adicionar Categoria</h4>
+					</div>
+					<div class="modal-body">
+						<label>Descrição</label>
+						<input type="text" name="description" id="description" class="form-control" />
+						<br />
+
+					</div>
+					<div class="modal-footer">
+						<input type="hidden" name="id" id="id" />
+						<input type="submit" name="action" id="action" class="btn btn-success" />
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="confirm" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">Confirmação</div>
+				<div class="modal-body">Deseja remover este registro?</div>
+				<div class="modal-footer">
+					<button type="button" data-dismiss="modal" class="btn btn-danger" id="delete">Excluir</button>
+					<button type="button" data-dismiss="modal" class="btn btn-default">Cancelar</button>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		$(document).ready(function () {
+
+			//Adicionar registro
+			$('#modal_button').click(function () {
+				$('#customerModal').modal('show'); //Abrir Modal
+				$('#description').val(''); //Limpar os campos
+				$('.modal-title').text("Adicionar Categoria"); //Trocamos o label
+				$('#action').val('Salvar'); //Trocamos o texto do botão
+			});
+
+			//Atualizar
+			$('.update').on('click', function () {
+				var id = $(this).attr("id");
+				var action = "getstring";
+				$.ajax({
+					url: "/getString",
+					method: "GET",
+					data: {
+						id: id,
+						action: action
+					},
+					dataType: "json",
+					success: function (data) {
+						$('#customerModal').modal('show'); //Abrir Modal
+						$('.modal-title').text("Atualizar Categoria"); //Trocamos o label
+						$('#action').val('Atualizar'); //Trocamos o texto do botão
+						$('form[name="frmCadastro"]').attr("action", "update");
+						$('#id').val(id);
+						$('#description').val(data.description);
+					}
+				});
+			});
+
+			//Excluir
+			$('.delete').on('click', function (e) {
+				var id = $(this).attr("id");
+				var action = "dropString";
+				e.preventDefault();
+
+				//Confirmação
+				$('#confirm').modal({
+					backdrop: 'static',
+					keyboard: false
+				}).one('click', '#delete', function (e) {
+
+					$.ajax({
+						url: "/dropString",
+						method: "GET",
+						data: {
+							id: id,
+							action: action
+						},
+						dataType: "json",
+						success: function (data) {
+							$('#customerModal').modal('show'); //Abrir Modal
+							$('.modal-title').text("Adicionar Categoria"); //Trocamos o label
+							$('#action').val('Atualizar'); //Trocamos o texto do botão
+							$('form[name="frmCadastro"]').attr("action", "update");
+							$('#id').val(id);
+							$('#description').val(data.description);
+						}
+					});
+
+				});
+
+
+			});
+
+		});
+	</script>
+
+</body>
+
+</html>
