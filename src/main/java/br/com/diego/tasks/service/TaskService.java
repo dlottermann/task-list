@@ -20,7 +20,7 @@ public class TaskService {
 	//Retorna todos as categorias
 	public Iterable<Category> lstCategories() {
 
-		Iterable<Category> categories = repositoryCat.findAll();
+		Iterable<Category> categories = repositoryCat.findByStatus(1);
 		return categories;
 
 	}
@@ -41,6 +41,7 @@ public class TaskService {
 	public void save(Task task) {
 		repository.save(task);
 	}
+
 
 
 	// Remover um registro

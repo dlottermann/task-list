@@ -102,10 +102,13 @@ public class TaskController {
 
 	// Inativar Ou mesmo que deletar
 	@RequestMapping(value = "task/dropString", method = RequestMethod.GET)
-	public String setStatus(@RequestParam("id") Long id, Model model) {
+	public String setStatus(@RequestParam("id") Long id,@RequestParam("status") int status, Model model) {
 
+		int s = 1;
+		if(status==1) {s = 0;};
+		
 		Task c = service.getRegistro(id);
-		c.setStatus(0);
+		c.setStatus(s);
 		service.save(c);
 
 		Iterable<Task> categories = service.listar();

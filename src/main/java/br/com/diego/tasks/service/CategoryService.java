@@ -35,4 +35,12 @@ public class CategoryService {
 		repository.deleteById(id);
 	}
 
+	//retorna ativos
+	public Iterable<Category> ativos() {
+
+		Iterable<Category> categories = repository.findByStatus(1);
+		return categories;
+
+	}
+	
 }

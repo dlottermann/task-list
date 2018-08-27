@@ -52,7 +52,7 @@ public class CategoryController {
 	
 	
 	// Atualizar
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	@RequestMapping(value = "category/update", method = RequestMethod.POST)
 	public String update(@RequestParam("description") String description, @RequestParam("id") Long id, Model model) {
 
 		Category c = service.getRegistro(id);
@@ -67,10 +67,14 @@ public class CategoryController {
 
 	//Inativar Ou mesmo que deletar
 	@RequestMapping(value = "/dropString", method = RequestMethod.GET)
-	public String setStatus(@RequestParam("id") Long id, Model model) {
+	public String setStatus(@RequestParam("id") Long id,@RequestParam("status") int status, Model model) {
 
+		
+		int s = 1;
+		if(status==1) {s = 0;};
+		
 		Category c = service.getRegistro(id);
-		c.setStatus(0);
+		c.setStatus(s);
 		service.save(c);
 
 		Iterable<Category> categories = service.listar();

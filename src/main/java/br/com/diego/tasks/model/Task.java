@@ -26,7 +26,6 @@ public class Task {
 	private String title;
 
 	@Column(nullable = false, length = 250)
-	@NotBlank(message = "Descrição da tarefa.")
 	private String description;
 
 	@Column(nullable = false, columnDefinition = "DATE")

@@ -7,9 +7,8 @@
 	<meta name="viewport" content="width=device-width" />
 
 	<link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css" />
-	<script type="text/javascript" src="/webjars/jquery/3.1.1/jquery.min.js"></script>
-	<script type="text/javascript" src="/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
-	<link rel="stylesheet" href="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+	
+	<link rel="stylesheet" href="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>
 
 	<title>Home</title>
 </head>
@@ -25,14 +24,16 @@
 		<div class="container">
 			<h2>Categorias</h2>
 			<div align="right">
-				<button type="button" id="modal_button" class="btn btn-info">Adicionar</button>
 
+			<button type="button" class="btn btn-link" onclick="window.location.href='/'" ><i class="fa fa-tasks"></i> Tarefas</button>
+							<button type="button" id="modal_button" class="btn btn-info">Adicionar</button>
 			</div>
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th>Cód.</th>
 						<th>Descrição</th>
+						<th>Status</th>
 						<th colspan="2"></th>
 					</tr>
 				</thead>
@@ -44,11 +45,16 @@
 						<td>
 							<span th:text="${cat.description}"></span>
 						</td>
-						<td>
-							<a href="javascript:;" th:id="${cat.id}" class="btn btn-warning update">Editar</a>
+						<td th:switch="${cat.status}">
+						    <b th:case="'0'">INATIVO</b>
+						    <b th:case="'1'">ATIVO</b>						    
 						</td>
-						<td>
-							<a href="javascript:;" th:id="${cat.id}" class="btn btn-danger delete">Excluir</a>
+						<td th:switch="${cat.status}">
+							<a href="javascript:;" th:id="${cat.id}" class="btn btn-warning update">Editar</a>
+						
+						
+							<a href="javascript:;" th:id="${cat.id}" th:attr="data-status=${cat.status}" class="btn btn-danger delete" th:case="'1'">Desativar</a>
+							<a href="javascript:;" th:id="${cat.id}" th:attr="data-status=${cat.status}" class="btn btn-success delete" th:case="'0'">Ativar</a>
 						</td>
 					</tr>
 				</tbody>
@@ -68,7 +74,7 @@
 					</div>
 					<div class="modal-body">
 						<label>Descrição</label>
-						<input type="text" name="description" id="description" class="form-control" />
+						<input type="text" name="description" id="description" class="form-control" required/>
 						<br />
 
 					</div>
@@ -86,9 +92,9 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">Confirmação</div>
-				<div class="modal-body">Deseja remover este registro?</div>
+				<div class="modal-body">Deseja mudar status deste registro?</div>
 				<div class="modal-footer">
-					<button type="button" data-dismiss="modal" class="btn btn-danger" id="delete">Excluir</button>
+					<button type="button" data-dismiss="modal" class="btn btn-warning" id="delete">Desativar</button>
 					<button type="button" data-dismiss="modal" class="btn btn-default">Cancelar</button>
 				</div>
 
@@ -96,7 +102,10 @@
 		</div>
 
 	</div>
-
+	
+<script type="text/javascript" src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
+	
 	<script>
 		$(document).ready(function () {
 
@@ -124,16 +133,17 @@
 						$('#customerModal').modal('show'); //Abrir Modal
 						$('.modal-title').text("Atualizar Categoria"); //Trocamos o label
 						$('#action').val('Atualizar'); //Trocamos o texto do botão
-						$('form[name="frmCadastro"]').attr("action", "update");
+						$('form[name="frmCadastro"]').attr("action", "category/update");
 						$('#id').val(id);
 						$('#description').val(data.description);
 					}
 				});
 			});
 
-			//Excluir
+			//desativar
 			$('.delete').on('click', function (e) {
 				var id = $(this).attr("id");
+				var status = $(this).data("status");
 				var action = "dropString";
 				e.preventDefault();
 
@@ -141,23 +151,17 @@
 				$('#confirm').modal({
 					backdrop: 'static',
 					keyboard: false
-				}).one('click', '#delete', function (e) {
-
+				}).one('click', '#delete', function (e) {						
 					$.ajax({
 						url: "/dropString",
 						method: "GET",
 						data: {
 							id: id,
+							status:status,
 							action: action
-						},
-						dataType: "json",
+						},						
 						success: function (data) {
-							$('#customerModal').modal('show'); //Abrir Modal
-							$('.modal-title').text("Adicionar Categoria"); //Trocamos o label
-							$('#action').val('Atualizar'); //Trocamos o texto do botão
-							$('form[name="frmCadastro"]').attr("action", "update");
-							$('#id').val(id);
-							$('#description').val(data.description);
+							window.location.href = "/category";
 						}
 					});
 
